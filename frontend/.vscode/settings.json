@@ -1,0 +1,4 @@
+{
+  "typescript.tsdk": "d:/Study/News_project/frontend/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}
