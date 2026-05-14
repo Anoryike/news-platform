@@ -37,6 +37,8 @@ class ArticleOut(BaseModel):
     id: int
     title: str
     body: str
+    imageUrl: str | None = None
+    sourceUrl: str | None = None
     status: str
     createdAt: datetime
     author: AuthorOut

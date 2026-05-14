@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import text
 from app.config import settings
 
 _db_url = (
@@ -30,3 +31,11 @@ async def get_db():
 async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        for col in ("image_url VARCHAR", "source_url VARCHAR"):
+            name = col.split()[0]
+            try:
+                await conn.execute(
+                    text(f"ALTER TABLE articles ADD COLUMN IF NOT EXISTS {col}")
+                )
+            except Exception:
+                pass

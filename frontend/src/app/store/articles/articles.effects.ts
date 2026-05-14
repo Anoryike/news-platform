@@ -5,6 +5,7 @@ import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ArticlesActions } from './articles.actions';
 import { ArticlesService } from '../../core/services/articles.service';
+import { WebsocketService } from '../../core/services/websocket.service';
 
 @Injectable()
 export class ArticlesEffects {
@@ -53,9 +54,20 @@ export class ArticlesEffects {
     { dispatch: false },
   );
 
+  // Listen to global feed WebSocket — updates scores in the feed in real time
+  feedScores$ = createEffect(() =>
+    this.wsService.onFeedUpdates().pipe(
+      map(({ articleId, score, explanation }) =>
+        ArticlesActions.scoreUpdated({ articleId, score, explanation }),
+      ),
+      catchError(() => of({ type: '[Articles] WS Feed Error' })),
+    ),
+  );
+
   constructor(
     private actions$: Actions,
     private articlesService: ArticlesService,
+    private wsService: WebsocketService,
     private router: Router,
   ) {}
 }

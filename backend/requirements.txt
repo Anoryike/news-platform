@@ -10,3 +10,5 @@ httpx==0.28.1
 transformers==5.8.1
 torch==2.12.0
 python-dotenv==1.2.2
+truststore==0.10.4
+certifi

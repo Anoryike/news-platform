@@ -13,4 +13,14 @@ export class WebsocketService {
       return () => ws.close();
     });
   }
+
+  onFeedUpdates(): Observable<{ articleId: number; score: number; explanation: string }> {
+    return new Observable((observer) => {
+      const ws = new WebSocket(`${environment.wsUrl}/ws/feed`);
+      ws.onmessage = (event) => observer.next(JSON.parse(event.data));
+      ws.onerror = () => observer.error('WebSocket error');
+      ws.onclose = () => observer.complete();
+      return () => ws.close();
+    });
+  }
 }

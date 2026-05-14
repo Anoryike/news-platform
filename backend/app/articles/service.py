@@ -1,5 +1,6 @@
+from fastapi import BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, update
+from sqlalchemy import select, func, update, delete
 from sqlalchemy.orm import selectinload
 from app.models import Article, AiScore, ArticleStatus, User
 from app.ai.ensemble import analyze_article
@@ -68,3 +69,15 @@ async def run_ai_analysis(article_id: int, title: str, body: str):
         await manager.send_score(article_id, result["score"], result["explanation"])
     except Exception as e:
         print(f"[AI] analysis failed for article {article_id}: {e}")
+
+
+async def reset_and_reanalyze_all(db: AsyncSession, background_tasks: BackgroundTasks) -> int:
+    await db.execute(delete(AiScore))
+    await db.execute(update(Article).values(status=ArticleStatus.PENDING))
+    await db.commit()
+
+    result = await db.execute(select(Article))
+    articles = result.scalars().all()
+    for article in articles:
+        background_tasks.add_task(run_ai_analysis, article.id, article.title, article.body)
+    return len(articles)

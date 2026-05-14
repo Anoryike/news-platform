@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     jwt_expire_minutes: int = 10080  # 7 days
     claimbuster_api_key: str = ""
     google_factcheck_api_key: str = ""
+    news_api_key: str = ""
     bert_model_name: str = "GonzaloA/fake-news-bert-base-uncased"
     port: int = 8000
 

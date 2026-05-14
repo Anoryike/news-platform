@@ -1,3 +1,4 @@
+import certifi
 import httpx
 from app.config import settings
 
@@ -6,7 +7,7 @@ async def analyze(text: str) -> float:
     if not settings.google_factcheck_api_key:
         return 50.0
     try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        async with httpx.AsyncClient(timeout=15.0, verify=False) as client:
             resp = await client.get(
                 "https://factchecktools.googleapis.com/v1alpha1/claims:search",
                 params={"key": settings.google_factcheck_api_key, "query": text[:200], "pageSize": 5},

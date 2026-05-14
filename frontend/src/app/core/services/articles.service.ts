@@ -15,6 +15,8 @@ export interface Article {
   id: number;
   title: string;
   body: string;
+  imageUrl: string | null;
+  sourceUrl: string | null;
   status: 'pending' | 'analyzed';
   createdAt: string;
   author: { id: number; email: string };
@@ -43,5 +45,20 @@ export class ArticlesService {
 
   create(title: string, body: string): Observable<Article> {
     return this.http.post<Article>(this.url, { title, body });
+  }
+
+  importNews(category = 'general', country = 'us'): Observable<{ imported: number; message: string }> {
+    return this.http.post<{ imported: number; message: string }>(
+      `${environment.apiUrl}/news/import`,
+      null,
+      { params: new HttpParams().set('category', category).set('country', country) }
+    );
+  }
+
+  reanalyzeAll(): Observable<{ queued: number; message: string }> {
+    return this.http.post<{ queued: number; message: string }>(
+      `${this.url}/reanalyze-all`,
+      null,
+    );
   }
 }

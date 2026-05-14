@@ -15,6 +15,8 @@ def _serialize(article) -> ArticleOut:
         id=article.id,
         title=article.title,
         body=article.body,
+        imageUrl=article.image_url,
+        sourceUrl=article.source_url,
         status=article.status.value,
         createdAt=article.created_at,
         author=article.author,
@@ -46,3 +48,13 @@ async def get_article(article_id: int, db: AsyncSession = Depends(get_db)):
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
     return _serialize(article)
+
+
+@router.post("/reanalyze-all")
+async def reanalyze_all(
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    count = await service.reset_and_reanalyze_all(db, background_tasks)
+    return {"queued": count, "message": f"Повторний аналіз запущено для {count} статей"}
